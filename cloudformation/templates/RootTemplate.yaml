@@ -1,0 +1,25 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Root template for production infrastructure
+
+Parameters:
+  EnvironmentName:
+    Type: String
+    Default: "production"
+    Description: "The environment name (e.g., production)."
+
+Resources:
+  VPCStack:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: ./VPC.yaml
+      Parameters:
+        EnvironmentName: !Ref EnvironmentName
+
+  ComputeStack:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: ./Compute.yaml
+      Parameters:
+        VPCId: !ImportValue !Sub "${EnvironmentName}-VPCId"
+        PublicSubnetId: !ImportValue !Sub "${EnvironmentName}-PublicSubnetId"
+        EnvironmentName: !Ref EnvironmentName

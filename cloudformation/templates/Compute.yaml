@@ -1,0 +1,71 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Compute resources for production env
+
+Parameters:
+  VPCId:
+    Type: String
+    Description: "The VPC ID where the EC2 instances will be deployed."
+  
+  PublicSubnetId:
+    Type: String
+    Description: "The Subnet ID where the EC2 instances will be deployed."
+
+Resources:
+  # IAM Role for EC2
+  EC2Role1:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: ec2.amazonaws.com
+            Action: sts:AssumeRole
+      Path: /
+      Policies:
+        - PolicyName: EC2Policy1
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - ec2:Describe*
+                  - s3:ListBucket
+                Resource: "*"
+
+  # Instance Profile for EC2 Role
+  EC2InstanceProfile1:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      Path: /
+      Roles:
+        - !Ref EC2Role1
+
+  # EC2 Instance with IAM Role
+  EC2Instance1:
+    Type: AWS::EC2::Instance
+    Properties:
+      InstanceType: t2.micro
+      ImageId: ami-0ae8f15ae66fe8cda
+      SubnetId: !Ref PublicSubnetId
+      IamInstanceProfile: !Ref EC2InstanceProfile1
+      Tags:
+        - Key: Name
+          Value: "Production-EC2Instance1"
+
+  # EC2 Instance Security Group
+  SecurityGroup1:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Enable SSH access via EC2 Instance Connect
+      VpcId: !Ref VPC1
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: 18.206.107.24/29 # EC2 Instance Connect IP range
