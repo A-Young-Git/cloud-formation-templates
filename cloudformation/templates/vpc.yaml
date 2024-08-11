@@ -126,6 +126,22 @@ Resources:
         - Key: Name
           Value: EC2Instance1
 
+  # EC2 Instance Security Group
+  SecurityGroup1:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Enable SSH access via EC2 Instance Connect
+      VpcId: !Ref VPC1
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: 18.206.107.24/29 # EC2 Instance Connect IP range
+
 Outputs:
   VPCId:
     Description: The VPC ID
