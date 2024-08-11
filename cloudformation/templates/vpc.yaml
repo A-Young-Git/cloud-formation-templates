@@ -1,0 +1,91 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Basic VPC Setup
+
+Resources:
+  # VPC
+  VPC-1:
+    Type: AWS::EC2:VPC
+    Properties:
+      CidrBlock: 10.0.0.0/16
+      EnableDnsSupport: true
+      EnableDnsHostnames: true
+      Tags:
+        - Key: Name
+          Value: VPC-1
+
+  # Internet Gateway
+  InternetGateway-1:
+    Type: AWS::EC2::InternetGateway
+    Properties:
+      Tags:
+        - Key: Name
+          Value: InternetGateway-1
+
+  # Attach Internet Gateway to VPC
+  VPCGatewayAttachment-1:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      VpcId: !Ref VPC-1
+      InternetGatewayId: !Ref InternetGateway-1
+
+  # Public Subnet
+  PublicSubnet-1:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC-1
+      CidrBlock: 10.0.1.0/24
+      MapPublicIpOnLaunch: true
+      AvailabilityZone: !Select
+      Tags:
+        - Key: Name
+          Value: PublicSubnet-1
+
+  # Private Subnet
+  PrivateSubnet-1:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC-1
+      CidrBlock: 10.0.2.0/24
+      MapPublicIpOnLaunch: false
+      AvailabilityZone: !Select
+      Tags:
+        - Key: Name
+          Value: PrivateSubnet-1
+
+  # Route Table for Public Subnet
+  PublicRouteTable-1:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref VPC-1
+      Tags:
+        - Key: Name
+          Value: PublicRouteTable-1
+
+  # Route For Internet Access
+  PublicRoute-1:
+    Type: AWS::EC2::Route
+    DependsOn: VPCGatewayAttachment-1
+    Properties:
+      RouteTableId: !Ref PublicRouteTable-1
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref InternetGateway-1
+
+  # Associate Route Table with Public Subnet:
+  SubnetRouteTableAssociation-1:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref PublicSubnet-1
+      RouteTableId: !Ref PublicRouteTable-1
+
+Outputs:
+  VPCId:
+    Description: The VPC ID
+    Value: !Ref VPC-1
+  PublicSubnetId:
+    Description: The ID of the public subnet
+    Value: !Ref PublicSubnet-1
+  PrivateSubnetId:
+    Description: The ID of the private subnet
+    Value: !Ref PrivateSubnet-1
+
+
