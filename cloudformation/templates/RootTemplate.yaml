@@ -8,18 +8,11 @@ Parameters:
     Description: "The environment name (e.g., production)."
 
 Resources:
-  VPCStack:
-    Type: AWS::CloudFormation::Stack
-    Properties:
-      TemplateURL: ./VPC.yaml
-      Parameters:
-        EnvironmentName: !Ref EnvironmentName
-
   ComputeStack:
     Type: AWS::CloudFormation::Stack
     Properties:
-      TemplateURL: ./Compute.yaml
+      TemplateURL: https://s3.amazonaws.com/my-devops-project-20240812-unique/templates/Compute.yaml
       Parameters:
-        VPCId: !ImportValue !Sub "${EnvironmentName}-VPCId"
-        PublicSubnetId: !ImportValue !Sub "${EnvironmentName}-PublicSubnetId"
+        VPCId: !ImportValue production-VPCId
+        PublicSubnetId: !ImportValue production-PublicSubnetId
         EnvironmentName: !Ref EnvironmentName

@@ -1,0 +1,22 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: S3 Bucket for storing CloudFormation templates
+
+Parameters:
+  BucketName:
+    Type: String
+    Description: "The name of the S3 bucket to create"
+    Default: "my-devops-project-20240812-unique"
+
+Resources:
+  CFTemplateBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Ref BucketName
+      AccessControl: Private
+
+Outputs:
+  BucketName:
+    Description: "The name of the created S3 bucket"
+    Value: !Ref CFTemplateBucket
+    Export:
+      Name: !Sub "${AWS::StackName}-BucketName"

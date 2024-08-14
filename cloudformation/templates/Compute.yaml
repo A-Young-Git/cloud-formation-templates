@@ -5,10 +5,12 @@ Parameters:
   VPCId:
     Type: String
     Description: "The VPC ID where the EC2 instances will be deployed."
-  
   PublicSubnetId:
     Type: String
     Description: "The Subnet ID where the EC2 instances will be deployed."
+  EnvironmentName:
+    Type: String
+    Description: "The environment name (e.g., production)."
 
 Resources:
   # IAM Role for EC2
@@ -52,14 +54,14 @@ Resources:
       IamInstanceProfile: !Ref EC2InstanceProfile1
       Tags:
         - Key: Name
-          Value: "Production-EC2Instance1"
+          Value: !Sub "${EnvironmentName}-EC2Instance1"
 
   # EC2 Instance Security Group
   SecurityGroup1:
     Type: AWS::EC2::SecurityGroup
     Properties:
       GroupDescription: Enable SSH access via EC2 Instance Connect
-      VpcId: !Ref VPC1
+      VpcId: !Ref VPCId
       SecurityGroupIngress:
         - IpProtocol: tcp
           FromPort: 22
