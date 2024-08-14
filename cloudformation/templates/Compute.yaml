@@ -52,6 +52,8 @@ Resources:
       ImageId: ami-0ae8f15ae66fe8cda
       SubnetId: !Ref PublicSubnetId
       IamInstanceProfile: !Ref EC2InstanceProfile1
+      SecurityGroupIds: 
+        - !Ref SecurityGroup1
       Tags:
         - Key: Name
           Value: !Sub "${EnvironmentName}-EC2Instance1"
